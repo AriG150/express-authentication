@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const ejsLayouts = require('express-ejs-layouts');
+const flash = require('connect-flash');
 const session = require('express-session');
 const app = express();
 const passport = require('./config/ppConfig');
@@ -12,11 +13,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.use(ejsLayouts);
 
+//Session must come before flash and passport
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true 
 }));
+
+// Must come after session and after passport middleware 
+app.use(flash());
 
 //These two lines must come after we set up the session
 app.use(passport.initialize());

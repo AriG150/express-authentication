@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const passport = requires('../config/ppConfig');
+const passport = require('../config/ppConfig');
 const db = require('../models');
 
 //show signup form
@@ -21,7 +21,9 @@ router.post('/signup', function(req, res){
     if ( created) {
       // we created it, redirect to home 
         console.log(`🍕 User successfully created`);
-        res.redirect('/')
+        passport.authenticate('local', {
+          successRedirect: '/'
+        }) (req, res);
     } else {
       //If user existed, error and reidrect to signup 
         console.log(`🍥 Email already exists`);
@@ -41,10 +43,15 @@ router.get('/login', function(req, res) {
 
 
 //POST form for login
-router.post('/login', passport.authenticat('local', {
+router.post('/login', passport.authenticate('local', {
   successRedirect: '/',
   failureRedirect: '/auth/login'
 }));
 
+//Logout 
+router.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
 
 module.exports = router;
