@@ -9,6 +9,7 @@ const app = express();
 const passport = require('./config/ppConfig');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const db = require('./models');
+const RateLimit = require('express-rate-limit');
 
 app.set('view engine', 'ejs');
 
@@ -17,6 +18,22 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.use(ejsLayouts);
 app.use(helmet());
+
+//Rate limiters for login and signup
+const loginLimiter = new RateLimit({
+  windowMs: 100 * 60 * 5, 
+  max: 3,
+  message: 'Maximum login attempts exceeded. Please try again later.'
+});
+
+const signupLimiter = new new RateLimit({
+  windowMs: 100 * 60 * 60,
+  max: 3,
+  message: 'Maximu accounts created. Please try again later.'
+})
+
+app.use('/auth/login', loginLimiter);
+app.use('/auth/signup', signupLimiter);
 
 const sessionStore = new SequelizeStore({
   db: db.sequelize,
