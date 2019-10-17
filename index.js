@@ -2,10 +2,13 @@ require('dotenv').config();
 const express = require('express');
 const ejsLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
+const helmet = require('helmet');
 const isLoggedIn = require('./middleware/isLoggedIn');
 const session = require('express-session');
 const app = express();
 const passport = require('./config/ppConfig');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const db = require('./models');
 
 app.set('view engine', 'ejs');
 
@@ -13,12 +16,22 @@ app.use(require('morgan')('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.use(ejsLayouts);
+app.use(helmet());
+
+const sessionStore = new SequelizeStore({
+  db: db.sequelize,
+  expiration: 1000 * 60 * 30
+});
+
+//Use this line once to set up the store table
+sessionStore.sync();
 
 //Session must come before flash and passport
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: true 
+  saveUninitialized: true,
+  store: sessionStore
 }));
 
 // Must come after session and after passport middleware 
