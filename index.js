@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const ejsLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
+const isLoggedIn = require('./middleware/isLoggedIn');
 const session = require('express-session');
 const app = express();
 const passport = require('./config/ppConfig');
@@ -27,11 +28,18 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(function(req, res, next){
+  // before every route, attach the flash messages and current user to res.locals
+  res.locals.alerts = req.flash();
+  res.locals.currentUser = req.user;
+  next();
+});
+
 app.get('/', function(req, res) {
   res.render('index');
 });
 
-app.get('/profile', function(req, res) {
+app.get('/profile', isLoggedIn, function(req, res) {
   res.render('profile');
 });
 
