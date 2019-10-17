@@ -32,9 +32,12 @@ const signupLimiter = new new RateLimit({
   message: 'Maximu accounts created. Please try again later.'
 })
 
-app.use('/auth/login', loginLimiter);
-app.use('/auth/signup', signupLimiter);
+// Apply rate limiters to the routes. Removed during testing. 
+// app.use('/auth/login', loginLimiter);
+// app.use('/auth/signup', signupLimiter);
 
+
+// Sotre sessions in the database 
 const sessionStore = new SequelizeStore({
   db: db.sequelize,
   expiration: 1000 * 60 * 30
