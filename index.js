@@ -26,7 +26,7 @@ const loginLimiter = new RateLimit({
   message: 'Maximum login attempts exceeded. Please try again later.'
 });
 
-const signupLimiter = new new RateLimit({
+const signupLimiter = new RateLimit({
   windowMs: 100 * 60 * 60,
   max: 3,
   message: 'Maximu accounts created. Please try again later.'
@@ -77,6 +77,7 @@ app.get('/profile', isLoggedIn, function(req, res) {
 });
 
 app.use('/auth', require('./controllers/auth'));
+
 
 var server = app.listen(process.env.PORT || 3001, () => console.log(`🎧 You're listening to Port 3001🎧`));
 
